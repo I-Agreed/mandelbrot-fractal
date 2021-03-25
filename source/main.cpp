@@ -10,8 +10,8 @@ SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL
 SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 void handle_point(int x, int y) {
-    float scaledX = (x - WIDTH*5/7)*3.5/WIDTH;
-    float scaledY = (y - HEIGHT/2)*2.0/HEIGHT;
+    float scaledX = (x - WIDTH*5/7)*max(3.5/WIDTH, 2.0/HEIGHT);
+    float scaledY = (y - HEIGHT/2)*max(3.5/WIDTH, 2.0/HEIGHT);
     float x2 = 0;
     float y2 = 0;
     float x3 = 0;
