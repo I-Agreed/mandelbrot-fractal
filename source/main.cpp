@@ -1,15 +1,17 @@
 #include <SDL2/SDL.h>
+#include <algorithm>
+using namespace std;
 
-const int WIDTH = 640;
-const int HEIGHT = 480;
-const int loops = 500;
+const int WIDTH = 1040;
+const int HEIGHT = 500;
+const int loops = 1000;
 SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
-                                         WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+                                         WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
 SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 void handle_point(int x, int y) {
-    float scaledX = x*3.5/WIDTH-2.5;
-    float scaledY = y*2.0/HEIGHT-1;
+    float scaledX = (x - WIDTH*5/7)*3.5/WIDTH;
+    float scaledY = (y - HEIGHT/2)*2.0/HEIGHT;
     float x2 = 0;
     float y2 = 0;
     float x3 = 0;
@@ -20,7 +22,7 @@ void handle_point(int x, int y) {
         x2 = x3;
         i++;
     }
-    SDL_SetRenderDrawColor(renderer, i/500.0*255, i/500.0*255, i/500.0*255, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, 255-i/500.0*255, 255-i/500.0*255, 255-i/500.0*255, SDL_ALPHA_OPAQUE);
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
@@ -30,6 +32,7 @@ void render_screen() {
             handle_point(x, y);
         }
     }
+    
     SDL_RenderPresent(renderer);
 }
 int main(int argc, char *argv[]) {
