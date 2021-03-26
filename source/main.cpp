@@ -15,6 +15,7 @@ double offsetX = 0;
 double offsetY = 0;
 float zoom = 1;
 bool mouseDown = false;
+bool gradient = true;
 
 int plotX_to_windowX(double x) {
     x *= zoom;
@@ -63,7 +64,14 @@ void handle_point(int x, int y) {
         i++;
     }
     float l = loops;
-    SDL_SetRenderDrawColor(renderer, 255-i/l*255, 255-i/l*255, 255-i/l*255, SDL_ALPHA_OPAQUE);
+    if (gradient) {
+        SDL_SetRenderDrawColor(renderer, 255-i/l*255, 255-i/l*255, 255-i/l*255, SDL_ALPHA_OPAQUE);
+    } else if (i == loops) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    } else {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    }
+    
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
@@ -113,6 +121,10 @@ void handle_keyPress(SDL_Event event){
         }
         case SDL_SCANCODE_DOWN: {
             zoom /= 2;
+            break;
+        }
+        case SDL_SCANCODE_SPACE: {
+            gradient = !gradient;
             break;
         }
     }
