@@ -32,7 +32,7 @@ int plotY_to_windowY(float y) {
     return y;
 }
 
-float window_to_plot(float x) {
+float windowX_to_plotX(float x) {
     x -= WIDTH/2.0;
     x /= zoom;
     x -= offsetX;
