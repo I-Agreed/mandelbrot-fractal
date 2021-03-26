@@ -11,8 +11,8 @@ SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 int lastMouseX = 0;
 int lastMouseY = 0;
-int offsetX = 0;
-int offsetY = 0;
+float offsetX = 0;
+float offsetY = 0;
 float zoom = 1;
 bool mouseDown = false;
 
@@ -79,8 +79,8 @@ void render_screen() {
 
 void handle_mouse_movement(SDL_Event event) {
     if (mouseDown) {
-        offsetX += event.button.x - lastMouseX;
-        offsetY += event.button.y - lastMouseY;
+        offsetX += (event.button.x - lastMouseX)/zoom;
+        offsetY += (event.button.y - lastMouseY)/zoom;
         lastMouseX = event.button.x;
         lastMouseY = event.button.y;
     }
@@ -108,11 +108,11 @@ void handle_scroll(SDL_Event event) {
 void handle_keyPress(SDL_Event event){
     switch (event.key.keysym.scancode) {
         case SDL_SCANCODE_UP: {
-            zoom += 1;
+            zoom *= 2;
             break;
         }
         case SDL_SCANCODE_DOWN: {
-            zoom -= 1;
+            zoom /= 2;
             break;
         }
     }
