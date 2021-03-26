@@ -4,7 +4,7 @@ using namespace std;
 
 const int WIDTH = 1040;
 const int HEIGHT = 500;
-const int loops = 300;
+const int loops = 100;
 SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
                                          WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
 SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
@@ -13,11 +13,12 @@ int startMouseX = 0;
 int startMouseY = 0;
 int offsetX = 0;
 int offsetY = 0;
+int zoom = 1;
 bool mouseDown = false;
 
 void handle_point(int x, int y) {
-    float scaledX = (x - WIDTH*5/7 - offsetX)*max(3.5/WIDTH, 2.0/HEIGHT);
-    float scaledY = (y - HEIGHT/2 - offsetY)*max(3.5/WIDTH, 2.0/HEIGHT);
+    float scaledX = (x - WIDTH*5.0/7.0 - offsetX)*max(3.5/WIDTH, 2.0/HEIGHT)/zoom;
+    float scaledY = (y - HEIGHT/2.0 - offsetY)*max(3.5/WIDTH, 2.0/HEIGHT)/zoom;
     float x2 = 0;
     float y2 = 0;
     float x3 = 0;
@@ -64,6 +65,13 @@ void handle_mouse_button(SDL_Event event) {
     }
 }
 
+void handle_scroll(SDL_Event event) {
+    if (event.wheel.which == SDL_TOUCH_MOUSEID) {
+        zoom += event.wheel.y;
+    }
+    
+}
+
 int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
     while (true) {
@@ -76,6 +84,7 @@ int main(int argc, char *argv[]) {
             case SDL_MOUSEMOTION: handle_mouse_movement(event);
             case SDL_MOUSEBUTTONDOWN: handle_mouse_button(event);
             case SDL_MOUSEBUTTONUP: handle_mouse_button(event);
+            case SDL_MOUSEWHEEL: handle_scroll(event);
             }
         }
     }
