@@ -9,16 +9,49 @@ SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL
                                          WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
 SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
-int startMouseX = 0;
-int startMouseY = 0;
+int lastMouseX = 0;
+int lastMouseY = 0;
 int offsetX = 0;
 int offsetY = 0;
-int zoom = 1;
+float zoom = 1;
 bool mouseDown = false;
 
+int plotX_to_windowX(float x) {
+    x *= zoom;
+    x /= max(3.5/WIDTH, 2.0/HEIGHT);
+    x += offsetX;
+    x += WIDTH*5.0/7.0;
+    return x;
+}
+
+int plotY_to_windowY(float y) {
+    y *= zoom;
+    y /= max(3.5/WIDTH, 2.0/HEIGHT);
+    y += offsetY;
+    y += WIDTH*5.0/7.0;
+    return y;
+}
+
+float window_to_plot(float x) {
+    x -= WIDTH/2.0;
+    x /= zoom;
+    x -= offsetX;
+    x *= max(3.5/WIDTH, 2.0/HEIGHT);
+    return x;
+}
+
+float windowY_to_plotY(float y) {
+    y -= HEIGHT/2.0;
+    y /= zoom;
+    y -= offsetY;
+    y *= max(3.5/WIDTH, 2.0/HEIGHT);
+    return y;
+}
+
 void handle_point(int x, int y) {
-    float scaledX = (x - WIDTH*5.0/7.0 - offsetX)*max(3.5/WIDTH, 2.0/HEIGHT)/zoom;
-    float scaledY = (y - HEIGHT/2.0 - offsetY)*max(3.5/WIDTH, 2.0/HEIGHT)/zoom;
+    
+    float scaledX = windowX_to_plotX(x);
+    float scaledY = windowY_to_plotY(y);
     float x2 = 0;
     float y2 = 0;
     float x3 = 0;
@@ -46,19 +79,19 @@ void render_screen() {
 
 void handle_mouse_movement(SDL_Event event) {
     if (mouseDown) {
-        offsetX = event.button.x - startMouseX;
-        offsetY = event.button.y - startMouseY;
+        offsetX += event.button.x - lastMouseX;
+        offsetY += event.button.y - lastMouseY;
+        lastMouseX = event.button.x;
+        lastMouseY = event.button.y;
     }
 }
 
 void handle_mouse_button(SDL_Event event) {
     if (event.button.button == SDL_BUTTON_LEFT) {
-        if (!mouseDown) {
-            startMouseX = event.button.x - offsetX;
-            startMouseY = event.button.y - offsetY;
-        }
         if (event.button.type == SDL_MOUSEBUTTONDOWN) {
             mouseDown = true;
+            lastMouseX = event.button.x;
+            lastMouseY = event.button.y;
         } else if (event.button.type == SDL_MOUSEBUTTONUP) {
             mouseDown = false;
         }
@@ -70,6 +103,19 @@ void handle_scroll(SDL_Event event) {
         zoom += event.wheel.y;
     }
     
+}
+
+void handle_keyPress(SDL_Event event){
+    switch (event.key.keysym.scancode) {
+        case SDL_SCANCODE_UP: {
+            zoom += 1;
+            break;
+        }
+        case SDL_SCANCODE_DOWN: {
+            zoom -= 1;
+            break;
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -85,6 +131,7 @@ int main(int argc, char *argv[]) {
             case SDL_MOUSEBUTTONDOWN: handle_mouse_button(event);
             case SDL_MOUSEBUTTONUP: handle_mouse_button(event);
             case SDL_MOUSEWHEEL: handle_scroll(event);
+            case SDL_KEYDOWN: handle_keyPress(event);
             }
         }
     }
