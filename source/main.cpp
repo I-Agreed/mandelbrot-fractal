@@ -18,17 +18,17 @@ bool mouseDown = false;
 bool gradient = true;
 
 int plotX_to_windowX(double x) {
-    x *= zoom;
     x /= max(3.5/WIDTH, 2.0/HEIGHT);
     x += offsetX;
+    x *= zoom;
     x += WIDTH*5.0/7.0;
     return x;
 }
 
 int plotY_to_windowY(double y) {
-    y *= zoom;
     y /= max(3.5/WIDTH, 2.0/HEIGHT);
     y += offsetY;
+    y *= zoom;
     y += WIDTH*5.0/7.0;
     return y;
 }
