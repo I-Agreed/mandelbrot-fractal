@@ -11,12 +11,12 @@ SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 int lastMouseX = 0;
 int lastMouseY = 0;
-float offsetX = 0;
-float offsetY = 0;
+double offsetX = 0;
+double offsetY = 0;
 float zoom = 1;
 bool mouseDown = false;
 
-int plotX_to_windowX(float x) {
+int plotX_to_windowX(double x) {
     x *= zoom;
     x /= max(3.5/WIDTH, 2.0/HEIGHT);
     x += offsetX;
@@ -24,7 +24,7 @@ int plotX_to_windowX(float x) {
     return x;
 }
 
-int plotY_to_windowY(float y) {
+int plotY_to_windowY(double y) {
     y *= zoom;
     y /= max(3.5/WIDTH, 2.0/HEIGHT);
     y += offsetY;
@@ -32,7 +32,7 @@ int plotY_to_windowY(float y) {
     return y;
 }
 
-float windowX_to_plotX(float x) {
+double windowX_to_plotX(double x) {
     x -= WIDTH/2.0;
     x /= zoom;
     x -= offsetX;
@@ -40,7 +40,7 @@ float windowX_to_plotX(float x) {
     return x;
 }
 
-float windowY_to_plotY(float y) {
+double windowY_to_plotY(double y) {
     y -= HEIGHT/2.0;
     y /= zoom;
     y -= offsetY;
@@ -50,11 +50,11 @@ float windowY_to_plotY(float y) {
 
 void handle_point(int x, int y) {
     
-    float scaledX = windowX_to_plotX(x);
-    float scaledY = windowY_to_plotY(y);
-    float x2 = 0;
-    float y2 = 0;
-    float x3 = 0;
+    double scaledX = windowX_to_plotX(x);
+    double scaledY = windowY_to_plotY(y);
+    double x2 = 0;
+    double y2 = 0;
+    double x3 = 0;
     int i = 0;
     while (i < loops && x2*x2 + y2*y2 <= 4) {
         x3 = x2*x2 - y2*y2 + scaledX;
