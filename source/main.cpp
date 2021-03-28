@@ -115,16 +115,32 @@ void handle_scroll(SDL_Event event) {
 
 void handle_keyPress(SDL_Event event){
     switch (event.key.keysym.scancode) {
-        case SDL_SCANCODE_UP: {
+        case SDL_SCANCODE_PAGEUP: {
             zoom *= 2;
             break;
         }
-        case SDL_SCANCODE_DOWN: {
+        case SDL_SCANCODE_PAGEDOWN: {
             zoom /= 2;
             break;
         }
         case SDL_SCANCODE_SPACE: {
             gradient = !gradient;
+            break;
+        }
+        case SDL_SCANCODE_LEFT: {
+            offsetX += 30/zoom;
+            break;
+        }
+        case SDL_SCANCODE_RIGHT: {
+            offsetX -= 30/zoom;
+            break;
+        }
+        case SDL_SCANCODE_UP: {
+            offsetY += 30/zoom;
+            break;
+        }
+        case SDL_SCANCODE_DOWN: {
+            offsetY -= 30/zoom;
             break;
         }
     }
