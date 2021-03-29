@@ -21,6 +21,28 @@ float power = 2;
 float colourDropOff = 4;
 int colours[loops+1][3];
 
+struct complex {
+    double x, y;
+    complex(double X, double Y) {
+        x = X;
+        y = Y;
+    }
+
+    complex operator+(complex other) {
+        return complex(x + other.x, y + other.y);
+    }
+    complex operator*(complex other) {
+        return complex(x*other.x - y*other.y, x*other.y + y*other.x);
+    }
+    complex operator+(double other) {
+        return complex(x + other, y);
+    }
+};
+
+double abs(complex c) {
+    return pow(pow(c.x, 2) + pow(c.y, 2), 0.5);
+}
+
 int plotX_to_windowX(double x) {
     x /= max(3.5/WIDTH, 2.0/HEIGHT);
     x += offsetX;
@@ -63,7 +85,7 @@ void handle_point(int x, int y) {
     int i = 0;
     while (i < loops && x2*x2 + y2*y2 <= 4) {
         x3 = x2*x2 - y2*y2 + scaledX;
-        y2 = power*x2*y2 + scaledY;
+        y2 = abs(power*x2*y2) + scaledY;
         x2 = x3;
         i++;
     }
