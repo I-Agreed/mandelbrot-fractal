@@ -75,18 +75,19 @@ double windowY_to_plotY(double y) {
     return y;
 }
 
+complex mandelbrot(complex z, complex c) {
+    return z*z + c;
+}
+
 void handle_point(int x, int y) {
     
     double scaledX = windowX_to_plotX(x);
     double scaledY = windowY_to_plotY(y);
-    double x2 = 0;
-    double y2 = 0;
-    double x3 = 0;
+    complex c = complex(scaledX, scaledY);
+    complex z = complex(0, 0);
     int i = 0;
-    while (i < loops && x2*x2 + y2*y2 <= 4) {
-        x3 = x2*x2 - y2*y2 + scaledX;
-        y2 = abs(power*x2*y2) + scaledY;
-        x2 = x3;
+    while (i < loops && z.x*z.x + z.y*z.y <= 4) {
+        z = mandelbrot(z, c);
         i++;
     }
     float l = loops;
