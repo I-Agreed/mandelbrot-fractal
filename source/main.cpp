@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <algorithm>
+#include <math.h>
 using namespace std;
 
 const int WIDTH = 1040;
@@ -17,6 +18,8 @@ float zoom = 1;
 bool mouseDown = false;
 bool gradient = true;
 float power = 2;
+float colourDropOff = 4;
+int colours[loops+1][3];
 
 int plotX_to_windowX(double x) {
     x /= max(3.5/WIDTH, 2.0/HEIGHT);
@@ -66,7 +69,11 @@ void handle_point(int x, int y) {
     }
     float l = loops;
     if (gradient) {
-        SDL_SetRenderDrawColor(renderer, 255-i/l*255, 255-i/l*255, 255-i/l*255, SDL_ALPHA_OPAQUE);
+        if (i == loops) {
+            SDL_SetRenderDrawColor(renderer, 255-i/l*255, 255-i/l*255, 255-i/l*255, SDL_ALPHA_OPAQUE);
+        } else {
+            SDL_SetRenderDrawColor(renderer, colours[i][0], 0, 0, SDL_ALPHA_OPAQUE);
+        }
     } else if (i == loops) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     } else {
@@ -148,6 +155,10 @@ void handle_keyPress(SDL_Event event){
 }
 
 int main(int argc, char *argv[]) {
+    for (int i = 1; i <= loops; i ++) {
+        int r = pow(-i+loops, colourDropOff)/pow(loops, colourDropOff)*255;
+        colours[i][0] = 255 - r;
+    }
     SDL_Init(SDL_INIT_VIDEO);
     while (true) {
         render_screen();
