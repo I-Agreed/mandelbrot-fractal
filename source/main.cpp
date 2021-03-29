@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <algorithm>
 #include <math.h>
+#define function mandelbrot
 using namespace std;
 
 const int WIDTH = 1040;
@@ -17,31 +18,11 @@ double offsetY = 0;
 float zoom = 1;
 bool mouseDown = false;
 bool gradient = true;
+
 float power = 2;
 float colourDropOff = 4;
+int colourMinimum = 32;
 int colours[loops+1][3];
-
-struct complex {
-    double x, y;
-    complex(double X, double Y) {
-        x = X;
-        y = Y;
-    }
-
-    complex operator+(complex other) {
-        return complex(x + other.x, y + other.y);
-    }
-    complex operator*(complex other) {
-        return complex(x*other.x - y*other.y, x*other.y + y*other.x);
-    }
-    complex operator+(double other) {
-        return complex(x + other, y);
-    }
-};
-
-double abs(complex c) {
-    return pow(pow(c.x, 2) + pow(c.y, 2), 0.5);
-}
 
 int plotX_to_windowX(double x) {
     x /= max(3.5/WIDTH, 2.0/HEIGHT);
@@ -75,19 +56,37 @@ double windowY_to_plotY(double y) {
     return y;
 }
 
-complex mandelbrot(complex z, complex c) {
-    return z*z + c;
+pair<double, double> trihorn(double zx, double zy, double cx, double cy) {
+    double outX = zx*zx - zy*zy + cx;
+    double outY = -power * zx * zy + cy;
+    return {outX, outY};
 }
+
+pair<double, double> burningShip(double zx, double zy, double cx, double cy) {
+    double outX = zx*zx - zy*zy + cx;
+    double outY = abs(power * zx * zy) + cy;
+    return {outX, outY};
+}
+
+pair<double, double> mandelbrot(double zx, double zy, double cx, double cy) {
+    double outX = zx*zx - zy*zy + cx;
+    double outY = power * zx * zy + cy;
+    return {outX, outY};
+}
+
+
 
 void handle_point(int x, int y) {
     
-    double scaledX = windowX_to_plotX(x);
-    double scaledY = windowY_to_plotY(y);
-    complex c = complex(scaledX, scaledY);
-    complex z = complex(0, 0);
+    double cx = windowX_to_plotX(x);
+    double cy = windowY_to_plotY(y);
+    double zx = 0;
+    double zy = 0;
     int i = 0;
-    while (i < loops && z.x*z.x + z.y*z.y <= 4) {
-        z = mandelbrot(z, c);
+    while (i < loops && zx*zx + zy*zy <= 4) {
+        pair<double, double> newZ = function(zx, zy, cx, cy);
+        zx = newZ.first;
+        zy = newZ.second;
         i++;
     }
     float l = loops;
@@ -179,7 +178,7 @@ void handle_keyPress(SDL_Event event){
 
 int main(int argc, char *argv[]) {
     for (int i = 1; i <= loops; i ++) {
-        int r = pow(-i+loops, colourDropOff)/pow(loops, colourDropOff)*255;
+        int r = pow(-i+loops, colourDropOff)/pow(loops, colourDropOff)*(255-colourMinimum);
         colours[i][0] = 255 - r;
     }
     SDL_Init(SDL_INIT_VIDEO);
