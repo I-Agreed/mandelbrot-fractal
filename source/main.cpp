@@ -16,6 +16,7 @@ double offsetY = 0;
 float zoom = 1;
 bool mouseDown = false;
 bool gradient = true;
+float power = 2;
 
 int plotX_to_windowX(double x) {
     x /= max(3.5/WIDTH, 2.0/HEIGHT);
@@ -59,7 +60,7 @@ void handle_point(int x, int y) {
     int i = 0;
     while (i < loops && x2*x2 + y2*y2 <= 4) {
         x3 = x2*x2 - y2*y2 + scaledX;
-        y2 = 2*x2*y2 + scaledY;
+        y2 = power*x2*y2 + scaledY;
         x2 = x3;
         i++;
     }
