@@ -8,7 +8,7 @@ using namespace std;
 
 const int WIDTH = 1040;
 const int HEIGHT = 500;
-const int IMG_SCALE = 1;
+const int IMG_SCALE = 5;
 const int loops = 100;
 const int imageLoops = 300;
 SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
@@ -59,6 +59,22 @@ double windowY_to_plotY(double y) {
     y /= zoom;
     y -= offsetY;
     y *= max(3.5/WIDTH, 2.0/HEIGHT);
+    return y;
+}
+
+double windowX_to_imageX(double x) {
+    x -= WIDTH*IMG_SCALE/2.0;
+    x /= zoom;
+    x -= offsetX;
+    x *= max(3.5/WIDTH*IMG_SCALE, 2.0/HEIGHT*IMG_SCALE);
+    return x;
+}
+
+double windowY_to_imageY(double y) {
+    y -= HEIGHT*IMG_SCALE/2.0;
+    y /= zoom;
+    y -= offsetY;
+    y *= max(3.5/WIDTH*IMG_SCALE, 2.0/HEIGHT*IMG_SCALE);
     return y;
 }
 
@@ -149,8 +165,8 @@ void save_image() {
     img.save_png(filename);
     for (int x = 0; x < img.width(); x++) {
         for (int y = 0; y < img.height(); y++) {
-            double cx = windowX_to_plotX(x/IMG_SCALE);
-            double cy = windowY_to_plotY(y/IMG_SCALE);
+            double cx = windowX_to_imageX(x);
+            double cy = windowY_to_imageY(y);
             double zx = 0;
             double zy = 0;
             int i = 0;
