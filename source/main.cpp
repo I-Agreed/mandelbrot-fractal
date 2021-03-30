@@ -95,11 +95,7 @@ void handle_point(int x, int y) {
     }
     float l = loops;
     if (gradient) {
-        if (i == loops) {
-            SDL_SetRenderDrawColor(renderer, 255-i/l*255, 255-i/l*255, 255-i/l*255, SDL_ALPHA_OPAQUE);
-        } else {
-            SDL_SetRenderDrawColor(renderer, colours[i][0], 0, 0, SDL_ALPHA_OPAQUE);
-        }
+        SDL_SetRenderDrawColor(renderer, colours[i][0], colours[i][1], colours[i][2], SDL_ALPHA_OPAQUE);
     } else if (i == loops) {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     } else {
@@ -147,12 +143,6 @@ void handle_scroll(SDL_Event event) {
     
 }
 
-void set_pixel(cimg_library::CImg<unsigned char> img, int x, int y, int c[3]) {
-    for (int i = 0; i < 3; i++) {
-        img(x, y, i) = c[i];
-    }
-}
-
 void save_image() {
     cimg_library::CImg<unsigned char> img(WIDTH*IMG_SCALE, HEIGHT*IMG_SCALE, 1, 3);
     img.save_png(filename);
@@ -169,12 +159,8 @@ void save_image() {
                 zy = newZ.second;
                 i++;
             }
-            float l = loops;
-            if (i == loops) {
-                int colour[3] = {255.-i/l*255, 255-i/l*255, 255-i/l*255};
-                set_pixel(img, x, y, colour);
-            } else {
-                set_pixel(img, x, y, colours[i]);
+            for (int j = 0; j < 3; j++) {
+                img(x, y, j) = colours[i][j];
             }
         }
     }
@@ -219,10 +205,13 @@ void handle_keyPress(SDL_Event event) {
 }
 
 int main(int argc, char *argv[]) {
-    for (int i = 1; i <= loops; i ++) {
+    for (int i = 1; i < loops; i ++) {
         int r = pow(-i+loops, colourDropOff)/pow(loops, colourDropOff)*(255-colourMinimum);
         colours[i][0] = 255 - r;
     }
+    colours[loops][0] = 0;
+    colours[loops][1] = 0;
+    colours[loops][2] = 0;
     SDL_Init(SDL_INIT_VIDEO);
     while (true) {
         render_screen();
