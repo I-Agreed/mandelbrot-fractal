@@ -10,6 +10,7 @@ const int WIDTH = 1040;
 const int HEIGHT = 500;
 const int IMG_SCALE = 1;
 const int loops = 100;
+const int imageLoops = 300;
 SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
                                          WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
 SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
@@ -24,8 +25,9 @@ bool gradient = true;
 
 float power = 2;
 float colourDropOff = 4;
-int colourMinimum = 32;
+int colourMinimum = 64;
 int colours[loops+1][3];
+int imageColours[imageLoops+1][3];
 char filename[] = "out.png";
 
 int plotX_to_windowX(double x) {
@@ -93,7 +95,6 @@ void handle_point(int x, int y) {
         zy = newZ.second;
         i++;
     }
-    float l = loops;
     if (gradient) {
         SDL_SetRenderDrawColor(renderer, colours[i][0], colours[i][1], colours[i][2], SDL_ALPHA_OPAQUE);
     } else if (i == loops) {
@@ -153,14 +154,14 @@ void save_image() {
             double zx = 0;
             double zy = 0;
             int i = 0;
-            while (i < loops && zx*zx + zy*zy <= 4) {
+            while (i < imageLoops && zx*zx + zy*zy <= 4) {
                 pair<double, double> newZ = function(zx, zy, cx, cy);
                 zx = newZ.first;
                 zy = newZ.second;
                 i++;
             }
             for (int j = 0; j < 3; j++) {
-                img(x, y, j) = colours[i][j];
+                img(x, y, j) = imageColours[i][j];
             }
         }
     }
@@ -205,13 +206,22 @@ void handle_keyPress(SDL_Event event) {
 }
 
 int main(int argc, char *argv[]) {
-    for (int i = 1; i < loops; i ++) {
+    for (int i = 0; i < loops; i ++) {
         int r = pow(-i+loops, colourDropOff)/pow(loops, colourDropOff)*(255-colourMinimum);
         colours[i][0] = 255 - r;
     }
     colours[loops][0] = 0;
     colours[loops][1] = 0;
     colours[loops][2] = 0;
+
+    for (int i = 0; i < imageLoops; i ++) {
+        int r = pow(-i+imageLoops, colourDropOff)/pow(imageLoops, colourDropOff)*(255-colourMinimum);
+        imageColours[i][0] = 255 - r;
+    }
+    imageColours[imageLoops][0] = 0;
+    imageColours[imageLoops][1] = 0;
+    imageColours[imageLoops][2] = 0;
+
     SDL_Init(SDL_INIT_VIDEO);
     while (true) {
         render_screen();
