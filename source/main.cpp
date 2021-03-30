@@ -1,11 +1,14 @@
-#include <SDL2/SDL.h>
+#include <CImg.h>
+#include <sdl2/SDL.h>
 #include <algorithm>
 #include <math.h>
+#include <string>
 #define function mandelbrot
 using namespace std;
 
 const int WIDTH = 1040;
 const int HEIGHT = 500;
+const int IMG_SCALE = 1;
 const int loops = 100;
 SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
                                          WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
@@ -23,6 +26,7 @@ float power = 2;
 float colourDropOff = 4;
 int colourMinimum = 32;
 int colours[loops+1][3];
+char filename[] = "out.png";
 
 int plotX_to_windowX(double x) {
     x /= max(3.5/WIDTH, 2.0/HEIGHT);
@@ -143,7 +147,41 @@ void handle_scroll(SDL_Event event) {
     
 }
 
-void handle_keyPress(SDL_Event event){
+void set_pixel(cimg_library::CImg<unsigned char> img, int x, int y, int c[3]) {
+    for (int i = 0; i < 3; i++) {
+        img(x, y, i) = c[i];
+    }
+}
+
+void save_image() {
+    cimg_library::CImg<unsigned char> img(WIDTH*IMG_SCALE, HEIGHT*IMG_SCALE, 1, 3);
+    img.save_png(filename);
+    for (int x = 0; x < img.width(); x++) {
+        for (int y = 0; y < img.height(); y++) {
+            double cx = windowX_to_plotX(x/IMG_SCALE);
+            double cy = windowY_to_plotY(y/IMG_SCALE);
+            double zx = 0;
+            double zy = 0;
+            int i = 0;
+            while (i < loops && zx*zx + zy*zy <= 4) {
+                pair<double, double> newZ = function(zx, zy, cx, cy);
+                zx = newZ.first;
+                zy = newZ.second;
+                i++;
+            }
+            float l = loops;
+            if (i == loops) {
+                int colour[3] = {255.-i/l*255, 255-i/l*255, 255-i/l*255};
+                set_pixel(img, x, y, colour);
+            } else {
+                set_pixel(img, x, y, colours[i]);
+            }
+        }
+    }
+    img.save_png(filename);
+}
+
+void handle_keyPress(SDL_Event event) {
     switch (event.key.keysym.scancode) {
         case SDL_SCANCODE_PAGEUP: {
             zoom *= 2;
@@ -171,6 +209,10 @@ void handle_keyPress(SDL_Event event){
         }
         case SDL_SCANCODE_DOWN: {
             offsetY -= 30/zoom;
+            break;
+        }
+        case SDL_SCANCODE_S: {
+            save_image();
             break;
         }
     }
