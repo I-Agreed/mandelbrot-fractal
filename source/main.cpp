@@ -8,9 +8,9 @@ using namespace std;
 
 const int WIDTH = 1040;
 const int HEIGHT = 500;
-const int IMG_SCALE = 5;
+const int IMG_SCALE = 10;
 const int loops = 100;
-const int imageLoops = 300;
+const int imageLoops = 100;
 SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
                                          WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
 SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
@@ -63,18 +63,20 @@ double windowY_to_plotY(double y) {
 }
 
 double windowX_to_imageX(double x) {
-    x -= WIDTH*IMG_SCALE/2.0;
+    x /= IMG_SCALE;
+    x -= WIDTH/2.0;
     x /= zoom;
     x -= offsetX;
-    x *= max(3.5/WIDTH*IMG_SCALE, 2.0/HEIGHT*IMG_SCALE);
+    x *= max(3.5/WIDTH, 2.0/HEIGHT);
     return x;
 }
 
 double windowY_to_imageY(double y) {
-    y -= HEIGHT*IMG_SCALE/2.0;
+    y  /= IMG_SCALE;
+    y -= HEIGHT/2.0;
     y /= zoom;
     y -= offsetY;
-    y *= max(3.5/WIDTH*IMG_SCALE, 2.0/HEIGHT*IMG_SCALE);
+    y *= max(3.5/WIDTH, 2.0/HEIGHT);
     return y;
 }
 
@@ -95,8 +97,6 @@ pair<double, double> mandelbrot(double zx, double zy, double cx, double cy) {
     double outY = power * zx * zy + cy;
     return {outX, outY};
 }
-
-
 
 void handle_point(int x, int y) {
     
