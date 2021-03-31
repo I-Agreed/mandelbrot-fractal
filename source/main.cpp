@@ -162,7 +162,6 @@ void handle_scroll(SDL_Event event) {
 
 void save_image() {
     cimg_library::CImg<unsigned char> img(WIDTH*IMG_SCALE, HEIGHT*IMG_SCALE, 1, 3);
-    img.save_png(filename);
     for (int x = 0; x < img.width(); x++) {
         for (int y = 0; y < img.height(); y++) {
             double cx = windowX_to_imageX(x);
