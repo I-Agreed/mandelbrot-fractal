@@ -8,17 +8,17 @@ using namespace std;
 
 const int WIDTH = 1040;
 const int HEIGHT = 500;
-const int IMG_SCALE = 10;
+const int IMG_SCALE = 5;
 const int loops = 100;
-const int imageLoops = 100;
+const int imageLoops = 400;
 SDL_Window* window = SDL_CreateWindow("Mandelbrot", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
                                          WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
 SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 int lastMouseX = 0;
 int lastMouseY = 0;
-double offsetX = 0;
-double offsetY = 0;
+long double offsetX = 0;
+long double offsetY = 0;
 float zoom = 1;
 bool mouseDown = false;
 bool gradient = true;
@@ -30,7 +30,7 @@ int colours[loops+1][3];
 int imageColours[imageLoops+1][3];
 char filename[] = "out.png";
 
-int plotX_to_windowX(double x) {
+int plotX_to_windowX(long double x) {
     x /= max(3.5/WIDTH, 2.0/HEIGHT);
     x += offsetX;
     x *= zoom;
@@ -38,7 +38,7 @@ int plotX_to_windowX(double x) {
     return x;
 }
 
-int plotY_to_windowY(double y) {
+int plotY_to_windowY(long double y) {
     y /= max(3.5/WIDTH, 2.0/HEIGHT);
     y += offsetY;
     y *= zoom;
@@ -46,7 +46,7 @@ int plotY_to_windowY(double y) {
     return y;
 }
 
-double windowX_to_plotX(double x) {
+long double windowX_to_plotX(long double x) {
     x -= WIDTH/2.0;
     x /= zoom;
     x -= offsetX;
@@ -54,7 +54,7 @@ double windowX_to_plotX(double x) {
     return x;
 }
 
-double windowY_to_plotY(double y) {
+long double windowY_to_plotY(long double y) {
     y -= HEIGHT/2.0;
     y /= zoom;
     y -= offsetY;
@@ -62,7 +62,7 @@ double windowY_to_plotY(double y) {
     return y;
 }
 
-double windowX_to_imageX(double x) {
+long double windowX_to_imageX(long double x) {
     x /= IMG_SCALE;
     x -= WIDTH/2.0;
     x /= zoom;
@@ -71,7 +71,7 @@ double windowX_to_imageX(double x) {
     return x;
 }
 
-double windowY_to_imageY(double y) {
+long double windowY_to_imageY(long double y) {
     y  /= IMG_SCALE;
     y -= HEIGHT/2.0;
     y /= zoom;
@@ -80,33 +80,33 @@ double windowY_to_imageY(double y) {
     return y;
 }
 
-pair<double, double> trihorn(double zx, double zy, double cx, double cy) {
-    double outX = zx*zx - zy*zy + cx;
-    double outY = -power * zx * zy + cy;
+pair<long double, long double> trihorn(long double zx, long double zy, long double cx, long double cy) {
+    long double outX = zx*zx - zy*zy + cx;
+    long double outY = -power * zx * zy + cy;
     return {outX, outY};
 }
 
-pair<double, double> burningShip(double zx, double zy, double cx, double cy) {
-    double outX = zx*zx - zy*zy + cx;
-    double outY = abs(power * zx * zy) + cy;
+pair<long double, long double> burningShip(long double zx, long double zy, long double cx, long double cy) {
+    long double outX = zx*zx - zy*zy + cx;
+    long double outY = abs(power * zx * zy) + cy;
     return {outX, outY};
 }
 
-pair<double, double> mandelbrot(double zx, double zy, double cx, double cy) {
-    double outX = zx*zx - zy*zy + cx;
-    double outY = power * zx * zy + cy;
+pair<long double, long double> mandelbrot(long double zx, long double zy, long double cx, long double cy) {
+    long double outX = zx*zx - zy*zy + cx;
+    long double outY = power * zx * zy + cy;
     return {outX, outY};
 }
 
 void handle_point(int x, int y) {
     
-    double cx = windowX_to_plotX(x);
-    double cy = windowY_to_plotY(y);
-    double zx = 0;
-    double zy = 0;
+    long double cx = windowX_to_plotX(x);
+    long double cy = windowY_to_plotY(y);
+    long double zx = 0;
+    long double zy = 0;
     int i = 0;
     while (i < loops && zx*zx + zy*zy <= 4) {
-        pair<double, double> newZ = function(zx, zy, cx, cy);
+        pair<long double, long double> newZ = function(zx, zy, cx, cy);
         zx = newZ.first;
         zy = newZ.second;
         i++;
@@ -164,13 +164,13 @@ void save_image() {
     cimg_library::CImg<unsigned char> img(WIDTH*IMG_SCALE, HEIGHT*IMG_SCALE, 1, 3);
     for (int x = 0; x < img.width(); x++) {
         for (int y = 0; y < img.height(); y++) {
-            double cx = windowX_to_imageX(x);
-            double cy = windowY_to_imageY(y);
-            double zx = 0;
-            double zy = 0;
+            long double cx = windowX_to_imageX(x);
+            long double cy = windowY_to_imageY(y);
+            long double zx = 0;
+            long double zy = 0;
             int i = 0;
             while (i < imageLoops && zx*zx + zy*zy <= 4) {
-                pair<double, double> newZ = function(zx, zy, cx, cy);
+                pair<long double, long double> newZ = function(zx, zy, cx, cy);
                 zx = newZ.first;
                 zy = newZ.second;
                 i++;
